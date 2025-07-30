@@ -31,13 +31,14 @@ stop:
 
 test:
 	@echo "Running unit tests..."
-	@docker build --target testing -t $(APP_NAME):test .
+	@docker build -t $(APP_NAME):test .
+	@docker run --rm -v $(PWD):/app -w /app $(APP_NAME):test go test -v ./...
 
 clean:
 	@echo "Cleaning up..."
 	@docker-compose down -v --remove-orphans
 	@docker rmi $(APP_NAME):latest $(APP_NAME):test 2>/dev/null || true
-	@rm -f main coverage.out coverage.html
+	@rm -f main
 	@echo "Cleanup complete"
 
 shell:
