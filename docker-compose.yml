@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pharmacy_claims_db
+    environment:
+      POSTGRES_USER: pharmacy_user
+      POSTGRES_PASSWORD: pharmacy_password
+      POSTGRES_DB: pharmacy_claims
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - pharmacy_network
+
+  app:
+    build:
+      context: .
+      target: base
+    container_name: pharmacy_claims_app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: pharmacy_user
+      DB_PASSWORD: pharmacy_password
+      DB_NAME: pharmacy_claims
+      MIGRATIONS_DIR: ./migrations
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ${PWD}:/app
+      - ./logs:/app/logs
+    networks:
+      - pharmacy_network
+
+volumes:
+  postgres_data:
+
+networks:
+  pharmacy_network:
+    driver: bridge
