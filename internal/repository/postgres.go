@@ -131,19 +131,6 @@ func (pr *Postgres) ReverseClaim(claimID uuid.UUID, reason string) error {
 	})
 }
 
-func (pr *Postgres) CreateReversal(reversal models.Reversal) error {
-	query := `
-		INSERT INTO reversals (id, claim_id, timestamp)
-		VALUES ($1, $2, $3)`
-
-	_, err := pr.db.Exec(query, reversal.ID, reversal.ClaimID, reversal.Timestamp.Time)
-	if err != nil {
-		return fmt.Errorf("failed to create reversal: %w", err)
-	}
-
-	return nil
-}
-
 func (pr *Postgres) BatchCreatePharmacies(pharmacies []models.Pharmacy) error {
 	columns := []string{"npi", "chain"}
 	values := make([][]interface{}, len(pharmacies))
